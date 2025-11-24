@@ -541,7 +541,7 @@ class _LifecycleStageChip extends StatelessWidget {
   });
 
   final String label;
-  final Color color;
+  final MaterialColor color;
 
   @override
   Widget build(BuildContext context) {
