@@ -42,17 +42,23 @@ class TreeAndLifecyclePage extends StatelessWidget {
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: const [
-            _TreeExplainer(),
-            SizedBox(height: 16),
-            Divider(),
-            SizedBox(height: 16),
-            _StatelessSection(),
-            SizedBox(height: 16),
-            _StatefulSection(),
-          ],
+        child: SingleChildScrollView(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: const [
+              _TreeExplainer(),
+              SizedBox(height: 16),
+              Divider(),
+              SizedBox(height: 16),
+              _StatelessSection(),
+              SizedBox(height: 16),
+              _StatefulSection(),
+              SizedBox(height: 16),
+              Divider(),
+              SizedBox(height: 16),
+              _LayoutShowcase(),
+            ],
+          ),
         ),
       ),
     );
@@ -577,5 +583,385 @@ class _LifecycleEvent {
     final String minutes = twoDigits(local.minute);
     final String seconds = twoDigits(local.second);
     return '$hours:$minutes:$seconds';
+  }
+}
+
+/// 三种常见布局方式的对比展示：Flex / Stack / LayoutBuilder。
+class _LayoutShowcase extends StatelessWidget {
+  const _LayoutShowcase();
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        const Text(
+          '布局示例：Flex、Stack、LayoutBuilder',
+          style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+        ),
+        const SizedBox(height: 12),
+        const Text(
+          '下面的三个卡片分别展示了：\n'
+          '1) Flex（Row）的 Expanded / Flexible 以及父约束对主轴的影响；\n'
+          '2) Stack 叠层布局，并使用 Positioned 控制绝对/相对偏移；\n'
+          '3) LayoutBuilder 自适应布局，根据最大宽度切换横排/竖排。',
+        ),
+        const SizedBox(height: 16),
+        Wrap(
+          spacing: 16,
+          runSpacing: 16,
+          children: const [
+            _FlexCard(),
+            _StackCard(),
+            _LayoutBuilderCard(),
+          ],
+        ),
+      ],
+    );
+  }
+}
+
+class _FlexCard extends StatelessWidget {
+  const _FlexCard();
+
+  @override
+  Widget build(BuildContext context) {
+    return _ShowcaseCard(
+      title: 'Flex：Expanded / Flexible / 约束',
+      description:
+          '主轴空间由父组件（下方的灰色容器）给出。Expanded 会强制填满剩余主轴空间，Flexible 可以按 flex 比例占据但允许子控件自定义尺寸。',
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Container(
+            padding: const EdgeInsets.all(8),
+            decoration: BoxDecoration(
+              color: Colors.grey.shade100,
+              borderRadius: BorderRadius.circular(8),
+              border: Border.all(color: Colors.grey.shade300),
+            ),
+            child: Row(
+              children: const [
+                Expanded(
+                  child: _FlexBox(
+                    label: 'Expanded\n(flex=2)',
+                    color: Colors.blue,
+                    flex: 2,
+                  ),
+                ),
+                SizedBox(width: 8),
+                Flexible(
+                  flex: 1,
+                  child: _FlexBox(
+                    label: 'Flexible\n(flex=1)',
+                    color: Colors.teal,
+                    flex: 1,
+                  ),
+                ),
+                SizedBox(width: 8),
+                Flexible(
+                  flex: 2,
+                  child: _FlexBox(
+                    label: 'Flexible\n(flex=2)\n可换行文本',
+                    color: Colors.orange,
+                    flex: 2,
+                  ),
+                ),
+              ],
+            ),
+          ),
+          const SizedBox(height: 8),
+          const Text(
+            '提示：Row/Column 的主轴尺寸受父级约束，Expanded 会拉伸充满剩余空间；Flexible 则在剩余空间内按比例分配，但允许内部根据内容自适应高度/宽度。',
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _StackCard extends StatelessWidget {
+  const _StackCard();
+
+  @override
+  Widget build(BuildContext context) {
+    return _ShowcaseCard(
+      title: 'Stack：叠层 + Positioned',
+      description: 'Stack 允许子组件按照声明顺序层叠；Positioned 可用于绝对或相对定位。未定位的子组件默认放在左上角。',
+      child: SizedBox(
+        width: 320,
+        height: 180,
+        child: Stack(
+          clipBehavior: Clip.none,
+          children: [
+            Container(
+              decoration: BoxDecoration(
+                color: Colors.purple.shade50,
+                borderRadius: BorderRadius.circular(12),
+              ),
+            ),
+            const Positioned(
+              left: 16,
+              top: 16,
+              child: _StackBadge(label: '左上角'),
+            ),
+            const Positioned(
+              right: 16,
+              bottom: 16,
+              child: _StackBadge(label: '右下角'),
+            ),
+            Positioned(
+              left: 60,
+              top: 50,
+              child: Transform.rotate(
+                angle: -0.1,
+                child: const _StackBadge(label: '旋转贴纸'),
+              ),
+            ),
+            Align(
+              alignment: Alignment.center,
+              child: Container(
+                padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 12),
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(12),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.purple.withOpacity(0.12),
+                      blurRadius: 10,
+                      offset: const Offset(0, 6),
+                    ),
+                  ],
+                ),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: const [
+                    Icon(Icons.layers, color: Colors.purple),
+                    SizedBox(height: 6),
+                    Text('Stack 叠层'),
+                  ],
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class _LayoutBuilderCard extends StatelessWidget {
+  const _LayoutBuilderCard();
+
+  @override
+  Widget build(BuildContext context) {
+    return _ShowcaseCard(
+      title: 'LayoutBuilder：自适应布局',
+      description:
+          'LayoutBuilder 在 build 时会把父组件的约束（BoxConstraints）传入 builder，便于根据最大宽度/高度切换不同布局。',
+      child: LayoutBuilder(
+        builder: (context, constraints) {
+          final bool isWide = constraints.maxWidth > 400;
+          final Widget info = Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Icon(
+                isWide ? Icons.desktop_mac : Icons.phone_android,
+                color: isWide ? Colors.green : Colors.blue,
+              ),
+              const SizedBox(width: 8),
+              Text('maxWidth: ${constraints.maxWidth.toStringAsFixed(0)}'),
+            ],
+          );
+
+          return AnimatedContainer(
+            duration: const Duration(milliseconds: 250),
+            padding: const EdgeInsets.all(12),
+            decoration: BoxDecoration(
+              color: Colors.grey.shade100,
+              borderRadius: BorderRadius.circular(12),
+              border: Border.all(color: Colors.grey.shade300),
+            ),
+            child: Flex(
+              direction: isWide ? Axis.horizontal : Axis.vertical,
+              mainAxisAlignment: MainAxisAlignment.spaceAround,
+              crossAxisAlignment:
+                  isWide ? CrossAxisAlignment.center : CrossAxisAlignment.stretch,
+              children: [
+                Flexible(
+                  child: _AdaptiveTile(
+                    color: Colors.green.shade100,
+                    label: '宽屏模式：横向排列\n窄屏模式：纵向堆叠',
+                  ),
+                ),
+                const SizedBox(width: 12, height: 12),
+                Flexible(
+                  child: _AdaptiveTile(
+                    color: Colors.blue.shade100,
+                    label: '使用 LayoutBuilder 的 builder 获取约束',
+                  ),
+                ),
+                const SizedBox(width: 12, height: 12),
+                Flexible(
+                  child: _AdaptiveTile(
+                    color: Colors.orange.shade100,
+                    label: '当前：${isWide ? '横向 Flex' : '纵向 Flex'}',
+                    trailing: info,
+                  ),
+                ),
+              ],
+            ),
+          );
+        },
+      ),
+    );
+  }
+}
+
+class _ShowcaseCard extends StatelessWidget {
+  const _ShowcaseCard({
+    required this.title,
+    required this.description,
+    required this.child,
+  });
+
+  final String title;
+  final String description;
+  final Widget child;
+
+  @override
+  Widget build(BuildContext context) {
+    return ConstrainedBox(
+      constraints: const BoxConstraints(maxWidth: 520),
+      child: Container(
+        width: double.infinity,
+        padding: const EdgeInsets.all(16),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(12),
+          border: Border.all(color: Colors.grey.withOpacity(0.2)),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withOpacity(0.04),
+              blurRadius: 10,
+              offset: const Offset(0, 4),
+            ),
+          ],
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              children: [
+                const Icon(Icons.view_quilt, color: Colors.blue),
+                const SizedBox(width: 8),
+                Expanded(
+                  child: Text(
+                    title,
+                    style: const TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 8),
+            Text(description),
+            const SizedBox(height: 12),
+            child,
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class _FlexBox extends StatelessWidget {
+  const _FlexBox({
+    required this.label,
+    required this.color,
+    required this.flex,
+  });
+
+  final String label;
+  final Color color;
+  final int flex;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.all(12),
+      decoration: BoxDecoration(
+        color: color.withOpacity(0.1),
+        borderRadius: BorderRadius.circular(8),
+        border: Border.all(color: color.withOpacity(0.5)),
+      ),
+      child: Column(
+        children: [
+          Icon(Icons.crop_16_9, color: color),
+          const SizedBox(height: 6),
+          Text(label, textAlign: TextAlign.center),
+          const SizedBox(height: 4),
+          Text('flex=$flex', style: const TextStyle(fontSize: 12)),
+        ],
+      ),
+    );
+  }
+}
+
+class _StackBadge extends StatelessWidget {
+  const _StackBadge({required this.label});
+
+  final String label;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+      decoration: BoxDecoration(
+        color: Colors.purple.withOpacity(0.12),
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: Colors.purple.shade200),
+      ),
+      child: Text(
+        label,
+        style: TextStyle(color: Colors.purple.shade700),
+      ),
+    );
+  }
+}
+
+class _AdaptiveTile extends StatelessWidget {
+  const _AdaptiveTile({
+    required this.color,
+    required this.label,
+    this.trailing,
+  });
+
+  final Color color;
+  final String label;
+  final Widget? trailing;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      margin: const EdgeInsets.symmetric(vertical: 4),
+      padding: const EdgeInsets.all(12),
+      decoration: BoxDecoration(
+        color: color,
+        borderRadius: BorderRadius.circular(10),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(label),
+          if (trailing != null) ...[
+            const SizedBox(height: 8),
+            trailing!,
+          ],
+        ],
+      ),
+    );
   }
 }
