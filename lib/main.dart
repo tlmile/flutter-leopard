@@ -127,27 +127,72 @@ class _StatefulSection extends StatefulWidget {
 }
 
 class _StatefulSectionState extends State<_StatefulSection> {
-  int _counter = 0;
+  static const _maxEventCount = 50;
 
-  // initState：State 被插入到 Element 树时调用，一次性初始化。此时可以订阅、初始化控制器等。
+  final ValueNotifier<List<_LifecycleEvent>> _eventLog =
+      ValueNotifier<List<_LifecycleEvent>>(<_LifecycleEvent>[]);
+
+  bool _showLifecycleCard = true;
+  int _version = 1;
+
   @override
-  void initState() {
-    super.initState();
-    debugPrint('initState：State 被创建并插入 Element 树时调用');
+  void dispose() {
+    _eventLog.dispose();
+    super.dispose();
   }
 
-  // didChangeDependencies：依赖的 InheritedWidget 发生变化或首次 build 前调用。
-  @override
-  void didChangeDependencies() {
-    super.didChangeDependencies();
-    debugPrint('didChangeDependencies：依赖的上下文/InheritedWidget 变化时调用');
+  void _recordEvent(
+    String label, {
+    required Color color,
+    required IconData icon,
+  }) {
+    final List<_LifecycleEvent> updated = List<_LifecycleEvent>.from(
+      _eventLog.value,
+    )
+      ..add(
+        _LifecycleEvent(
+          label: label,
+          color: color,
+          icon: icon,
+          timestamp: DateTime.now(),
+        ),
+      );
+
+    if (updated.length > _maxEventCount) {
+      updated.removeRange(0, updated.length - _maxEventCount);
+    }
+
+    _eventLog.value = updated;
   }
 
-  // build：根据当前状态构建 Widget 树。每次 setState 之后都会重新执行。
+  void _clearEventLog() {
+    _eventLog.value = <_LifecycleEvent>[];
+  }
+
+  void _rebuildChild() {
+    setState(() {
+      _version++;
+    });
+    _recordEvent(
+      '父组件 setState（version $_version）：触发子组件 didUpdateWidget + build',
+      color: Colors.teal,
+      icon: Icons.refresh,
+    );
+  }
+
+  void _toggleChild() {
+    setState(() {
+      _showLifecycleCard = !_showLifecycleCard;
+    });
+    _recordEvent(
+      _showLifecycleCard ? '重新挂载组件：会重新走 initState' : '卸载组件：触发 deactivate -> dispose',
+      color: _showLifecycleCard ? Colors.indigo : Colors.red,
+      icon: _showLifecycleCard ? Icons.play_circle : Icons.stop_circle,
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
-    debugPrint('build：根据当前状态构建 Widget');
-
     return Container(
       padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
@@ -158,65 +203,379 @@ class _StatefulSectionState extends State<_StatefulSection> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           const Text(
-            'StatefulWidget 示例',
+            'StatefulWidget 生命周期演示',
             style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
           ),
           const SizedBox(height: 8),
-          const Text('特性：有独立的 State 对象，通过 setState 修改状态并触发重新 build。'),
-          const SizedBox(height: 8),
-          Text('计数：$_counter'),
+          const Text(
+            '通过挂载/卸载、父组件 setState、子组件内部 setState，多角度观察 initState → build → dispose 等生命周期。',
+          ),
+          const SizedBox(height: 12),
+          Wrap(
+            spacing: 8,
+            runSpacing: 8,
+            children: const [
+              _LifecycleStageChip(label: 'initState', color: Colors.indigo),
+              _LifecycleStageChip(label: 'didChangeDependencies', color: Colors.deepPurple),
+              _LifecycleStageChip(label: 'build', color: Colors.blue),
+              _LifecycleStageChip(label: 'didUpdateWidget', color: Colors.teal),
+              _LifecycleStageChip(label: 'setState → build', color: Colors.orange),
+              _LifecycleStageChip(label: 'deactivate', color: Colors.grey),
+              _LifecycleStageChip(label: 'dispose', color: Colors.red),
+            ],
+          ),
           const SizedBox(height: 12),
           Row(
             children: [
-              ElevatedButton(
-                onPressed: () {
-                  setState(() {
-                    // setState 会标记此 State 所在的 Element 需要重新构建；
-                    // 重新 build 时会创建新的 Widget，并在需要时更新 RenderObject。
-                    _counter++;
-                  });
-                },
-                child: const Text('setState 触发重新 build'),
+              ElevatedButton.icon(
+                onPressed: _rebuildChild,
+                icon: const Icon(Icons.refresh),
+                label: const Text('父组件 setState（+1 版本）'),
               ),
               const SizedBox(width: 12),
-              ElevatedButton(
-                onPressed: () {
-                  // 触发更新父级的 StatefulWidget（模拟 didUpdateWidget 调用），
-                  // 实际运行中可以在热重载或父 Widget 传参变化时观察日志。
-                  setState(() {
-                    _counter = 0;
-                  });
-                },
-                child: const Text('重置计数'),
+              OutlinedButton.icon(
+                onPressed: _toggleChild,
+                icon: Icon(_showLifecycleCard ? Icons.visibility_off : Icons.visibility),
+                label: Text(_showLifecycleCard ? '卸载子组件 (dispose)' : '重新挂载 (initState)'),
+              ),
+              const SizedBox(width: 12),
+              TextButton(
+                onPressed: _clearEventLog,
+                child: const Text('清空日志'),
               ),
             ],
           ),
-          const SizedBox(height: 8),
-          const Text('生命周期顺序常见为：initState -> didChangeDependencies -> build -> '
-              '（setState -> build） -> deactivate -> dispose'),
+          const SizedBox(height: 12),
+          AnimatedSwitcher(
+            duration: const Duration(milliseconds: 250),
+            child: _showLifecycleCard
+                ? _LifecycleDemoCard(
+                    key: ValueKey<int>(_version),
+                    version: _version,
+                    onEvent: _recordEvent,
+                  )
+                : const _LifecyclePlaceholder(),
+          ),
+          const SizedBox(height: 12),
+          _LifecycleEventPanel(eventLog: _eventLog),
         ],
       ),
     );
   }
+}
 
-  // didUpdateWidget：当父 Widget 重新 build 且配置发生变化时调用，用于响应新旧 Widget 差异。
+class _LifecycleDemoCard extends StatefulWidget {
+  const _LifecycleDemoCard({
+    super.key,
+    required this.version,
+    required this.onEvent,
+  });
+
+  final int version;
+  final void Function(String label, {required Color color, required IconData icon})
+      onEvent;
+
   @override
-  void didUpdateWidget(covariant _StatefulSection oldWidget) {
-    super.didUpdateWidget(oldWidget);
-    debugPrint('didUpdateWidget：父 Widget 触发重建，新的 Widget 配置传入时调用');
+  State<_LifecycleDemoCard> createState() => _LifecycleDemoCardState();
+}
+
+class _LifecycleDemoCardState extends State<_LifecycleDemoCard> {
+  int _counter = 0;
+
+  void _log(String text, Color color, IconData icon) {
+    widget.onEvent(text, color: color, icon: icon);
   }
 
-  // deactivate：当 State 从树中暂时移除时调用（例如重排、导航离开但尚未销毁）。
+  @override
+  void initState() {
+    super.initState();
+    _log('initState：State 被创建并插入树', Colors.indigo, Icons.play_arrow);
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    _log('didChangeDependencies：首次或依赖变化时触发', Colors.deepPurple, Icons.link);
+  }
+
+  @override
+  void didUpdateWidget(covariant _LifecycleDemoCard oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.version != widget.version) {
+      _log('didUpdateWidget：父组件传入 version ${widget.version}', Colors.teal, Icons.system_update_alt);
+    }
+  }
+
   @override
   void deactivate() {
-    debugPrint('deactivate：State 从 Element 树暂时移除');
+    _log('deactivate：暂时从树中移除', Colors.grey, Icons.pause_circle);
     super.deactivate();
   }
 
-  // dispose：当 State 永久移除时调用，用于释放资源、取消订阅。
   @override
   void dispose() {
-    debugPrint('dispose：State 永久移除，释放资源');
+    _log('dispose：永久移除，释放资源', Colors.red, Icons.stop_circle);
     super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    _log('build：根据当前状态构建 UI（version ${widget.version}）', Colors.blue, Icons.architecture);
+
+    return Container(
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: Colors.green.withOpacity(0.2)),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.green.withOpacity(0.06),
+            blurRadius: 12,
+            offset: const Offset(0, 6),
+          ),
+        ],
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Icon(Icons.science, color: Colors.green.shade700),
+              const SizedBox(width: 8),
+              Text(
+                '子组件版本：${widget.version}',
+                style: const TextStyle(fontWeight: FontWeight.bold),
+              ),
+              const Spacer(),
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                decoration: BoxDecoration(
+                  color: Colors.orange.withOpacity(0.1),
+                  borderRadius: BorderRadius.circular(20),
+                ),
+                child: Row(
+                  children: [
+                    Icon(Icons.memory, size: 16, color: Colors.orange.shade700),
+                    const SizedBox(width: 4),
+                    Text('State 存活计数：$_counter'),
+                  ],
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 12),
+          const Text(
+            '点击按钮模拟 setState：会触发 build，并在事件面板看到日志。',
+          ),
+          const SizedBox(height: 8),
+          Row(
+            children: [
+              ElevatedButton.icon(
+                onPressed: () {
+                  setState(() {
+                    _counter++;
+                    _log('setState：计数 +1（$_counter）', Colors.orange, Icons.add);
+                  });
+                },
+                icon: const Icon(Icons.add),
+                label: const Text('子组件 setState'),
+              ),
+              const SizedBox(width: 12),
+              OutlinedButton.icon(
+                onPressed: () {
+                  setState(() {
+                    _counter = 0;
+                    _log('setState：计数归零', Colors.orange, Icons.restart_alt);
+                  });
+                },
+                icon: const Icon(Icons.refresh),
+                label: const Text('重置计数'),
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _LifecycleEventPanel extends StatelessWidget {
+  const _LifecycleEventPanel({required this.eventLog});
+
+  final ValueNotifier<List<_LifecycleEvent>> eventLog;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.all(12),
+      decoration: BoxDecoration(
+        color: Colors.grey.shade50,
+        borderRadius: BorderRadius.circular(10),
+        border: Border.all(color: Colors.grey.withOpacity(0.2)),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Icon(Icons.timeline, color: Colors.blue.shade700),
+              const SizedBox(width: 6),
+              const Text(
+                '生命周期事件面板',
+                style: TextStyle(fontWeight: FontWeight.bold),
+              ),
+              const Spacer(),
+              const Text('init → build → dispose 全流程'),
+            ],
+          ),
+          const SizedBox(height: 8),
+          ValueListenableBuilder<List<_LifecycleEvent>>(
+            valueListenable: eventLog,
+            builder: (context, events, _) {
+              if (events.isEmpty) {
+                return Padding(
+                  padding: const EdgeInsets.symmetric(vertical: 12),
+                  child: Row(
+                    children: const [
+                      Icon(Icons.info_outline, color: Colors.grey),
+                      SizedBox(width: 6),
+                      Text('暂无事件，请点击上方按钮或切换挂载状态。'),
+                    ],
+                  ),
+                );
+              }
+
+              final List<_LifecycleEvent> reversed = events.reversed.toList();
+              return Column(
+                children: [
+                  for (final _LifecycleEvent event in reversed)
+                    _LifecycleEventTile(event: event),
+                ],
+              );
+            },
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _LifecycleEventTile extends StatelessWidget {
+  const _LifecycleEventTile({required this.event});
+
+  final _LifecycleEvent event;
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 6),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Container(
+            width: 32,
+            height: 32,
+            decoration: BoxDecoration(
+              color: event.color.withOpacity(0.15),
+              shape: BoxShape.circle,
+            ),
+            child: Icon(event.icon, size: 18, color: event.color),
+          ),
+          const SizedBox(width: 10),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  event.label,
+                  style: const TextStyle(fontWeight: FontWeight.w600),
+                ),
+                const SizedBox(height: 4),
+                Text(
+                  event.formattedTime,
+                  style: TextStyle(color: Colors.grey.shade600, fontSize: 12),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _LifecyclePlaceholder extends StatelessWidget {
+  const _LifecyclePlaceholder();
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.all(24),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: Colors.grey.withOpacity(0.25)),
+      ),
+      child: Row(
+        children: const [
+          Icon(Icons.visibility_off, color: Colors.grey),
+          SizedBox(width: 8),
+          Expanded(
+            child: Text(
+              '子组件已卸载，生命周期将停止在 dispose。点击上方“重新挂载”重新体验 init → build → dispose。',
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _LifecycleStageChip extends StatelessWidget {
+  const _LifecycleStageChip({
+    required this.label,
+    required this.color,
+  });
+
+  final String label;
+  final Color color;
+
+  @override
+  Widget build(BuildContext context) {
+    return Chip(
+      label: Text(label),
+      backgroundColor: color.withOpacity(0.08),
+      labelStyle: TextStyle(color: color.shade700),
+      avatar: CircleAvatar(
+        backgroundColor: color,
+        child: const Icon(Icons.bolt, size: 14, color: Colors.white),
+      ),
+    );
+  }
+}
+
+class _LifecycleEvent {
+  const _LifecycleEvent({
+    required this.label,
+    required this.color,
+    required this.icon,
+    required this.timestamp,
+  });
+
+  final String label;
+  final Color color;
+  final IconData icon;
+  final DateTime timestamp;
+
+  String get formattedTime {
+    final DateTime local = timestamp.toLocal();
+    final String twoDigits(int value) => value.toString().padLeft(2, '0');
+    final String hours = twoDigits(local.hour);
+    final String minutes = twoDigits(local.minute);
+    final String seconds = twoDigits(local.second);
+    return '$hours:$minutes:$seconds';
   }
 }
