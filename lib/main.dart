@@ -40,25 +40,22 @@ class TreeAndLifecyclePage extends StatelessWidget {
       appBar: AppBar(
         title: const Text('三棵树 + 生命周期 Demo'),
       ),
-      body: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: SingleChildScrollView(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: const [
-              _TreeExplainer(),
-              SizedBox(height: 16),
-              Divider(),
-              SizedBox(height: 16),
-              _StatelessSection(),
-              SizedBox(height: 16),
-              _StatefulSection(),
-              SizedBox(height: 16),
-              Divider(),
-              SizedBox(height: 16),
-              _LayoutShowcase(),
-            ],
-          ),
+      body: SafeArea(
+        child: ListView(
+          padding: const EdgeInsets.all(16.0),
+          children: const [
+            _TreeExplainer(),
+            SizedBox(height: 16),
+            Divider(),
+            SizedBox(height: 16),
+            _StatelessSection(),
+            SizedBox(height: 16),
+            _StatefulSection(),
+            SizedBox(height: 16),
+            Divider(),
+            SizedBox(height: 16),
+            _LayoutShowcase(),
+          ],
         ),
       ),
     );
