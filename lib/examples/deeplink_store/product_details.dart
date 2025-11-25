@@ -41,8 +41,7 @@ class ProductPicture extends StatelessWidget {
         LayoutBuilder(
           builder: (BuildContext context, BoxConstraints constraints) {
             return Image.asset(
-              product.assetName2X,
-              package: product.assetPackage,
+              product.assetName,
               fit: BoxFit.cover,
               width: constraints.maxWidth,
             );

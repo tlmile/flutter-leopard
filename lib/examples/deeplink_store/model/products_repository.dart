@@ -250,9 +250,7 @@ class Product {
   final String name;
   final int price;
 
-  String get assetName => '$id-0.jpg';
+  String get assetName => 'lib/examples/deeplink_store/assets/products/$id-0.jpg';
 
-  String get assetName2X => '2.0x/$id-0.jpg';
-
-  String get assetPackage => 'shrine_images';
+  String get assetName2X => 'lib/examples/deeplink_store/assets/products/2.0x/$id-0.jpg';
 }
