@@ -9,7 +9,7 @@ class LoginExampleApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return const MaterialApp(
+    return MaterialApp(
       debugShowCheckedModeBanner: true,
       home: _LoginPage(),
     );
@@ -21,7 +21,7 @@ class _LoginPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return const Scaffold(
+    return Scaffold(
       appBar: AppBar(title: Text('登录示例')),
       body: Center(
         child: Text('这里将来是登录页面的 UI 示例'),

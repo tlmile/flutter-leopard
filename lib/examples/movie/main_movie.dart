@@ -9,7 +9,7 @@ class MovieExampleApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return const MaterialApp(
+    return MaterialApp(
       debugShowCheckedModeBanner: true,
       home: _MoviePage(),
     );
@@ -21,7 +21,7 @@ class _MoviePage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return const Scaffold(
+    return Scaffold(
       appBar: AppBar(title: Text('电影示例')),
       body: Center(
         child: Text('这里将来是电影列表 / 详情的 UI 示例'),
