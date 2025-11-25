@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_leopard_demo/examples/deeplink_store/model/products_repository.dart';
 import 'package:flutter_leopard_demo/examples/deeplink_store/row_item.dart';
 import 'package:flutter_leopard_demo/examples/deeplink_store/styles.dart';
+import 'package:go_router/go_router.dart';
 
 class ProductList extends StatelessWidget {
   const ProductList({super.key});
@@ -12,17 +13,56 @@ class ProductList extends StatelessWidget {
         .toList();
     return Scaffold(// scaffold 是Material 设计里 一个完整页面的基础结构
       backgroundColor: Styles.scaffoldBackground,
-      body: CustomScrollView(//可以放多个 Sliver 组件的可滚动区域容器
-        slivers: <Widget>[
-          const SliverAppBar(
-            title: Text('Material Store',style: Styles.productListTitle,),
-            backgroundColor: Styles.scaffoldAppBarBackground,
-            pinned: true,//表示sliverappbar在向上滚动时，不会完全溢出 屏幕，而是会吸在顶端
-          ),
-          SliverList(
-            delegate: SliverChildListDelegate(children),
-          ),
-        ],
+      body: Scrollbar(
+        thumbVisibility: true,
+        child: CustomScrollView(//可以放多个 Sliver 组件的可滚动区域容器
+          slivers: <Widget>[
+            const SliverAppBar(
+              title: Text(
+                'Material Store',
+                style: Styles.productListTitle,
+              ),
+              backgroundColor: Styles.scaffoldAppBarBackground,
+              pinned: true,//表示sliverappbar在向上滚动时，不会完全溢出 屏幕，而是会吸在顶端
+            ),
+            const _CategorySelector(),
+            SliverList(
+              delegate: SliverChildListDelegate(children),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class _CategorySelector extends StatelessWidget {
+  const _CategorySelector();
+
+  @override
+  Widget build(BuildContext context) {
+    final List<(String label, VoidCallback onTap)> categories = [
+      ('全部', () => context.go('/')),
+      ('Accessories', () => context.go('/category/accessories')),
+      ('Clothing', () => context.go('/category/clothing')),
+      ('Home', () => context.go('/category/home')),
+    ];
+
+    return SliverToBoxAdapter(
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+        child: Wrap(
+          spacing: 12,
+          runSpacing: 8,
+          children: categories
+              .map(
+                (category) => ActionChip(
+                  label: Text(category.$1),
+                  onPressed: category.$2,
+                ),
+              )
+              .toList(),
+        ),
       ),
     );
   }
