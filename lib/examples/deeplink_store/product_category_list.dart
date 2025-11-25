@@ -6,15 +6,28 @@ import 'package:flutter_leopard_demo/examples/deeplink_store/styles.dart';
 
 import 'model/products_repository.dart';
 
-class ProductCategoryList extends StatelessWidget {
+class ProductCategoryList extends StatefulWidget {
   const ProductCategoryList({super.key});
+
+  @override
+  State<ProductCategoryList> createState() => _ProductCategoryListState();
+}
+
+class _ProductCategoryListState extends State<ProductCategoryList> {
+  final ScrollController _scrollController = ScrollController();
+
+  @override
+  void dispose() {
+    _scrollController.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
     final GoRouterState state = GoRouterState.of(context);
     final Category category = Category.values.firstWhere(
           (Category value) =>
-          value.toString().contains(state.pathParameters['category']!),
+              value.toString().contains(state.pathParameters['category']!),
       orElse: () => Category.all,
     );
     final List<Widget> children = ProductsRepository.loadProducts(
@@ -23,8 +36,10 @@ class ProductCategoryList extends StatelessWidget {
     return Scaffold(
       backgroundColor: Styles.scaffoldBackground,
       body: Scrollbar(
+        controller: _scrollController,
         thumbVisibility: true,
         child: CustomScrollView(
+          controller: _scrollController,
           slivers: <Widget>[
             SliverAppBar(
               title: Text(
