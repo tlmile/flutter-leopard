@@ -41,7 +41,10 @@ class _ProductListState extends State<ProductList> {
               backgroundColor: Styles.scaffoldAppBarBackground,
               pinned: true,//表示sliverappbar在向上滚动时，不会完全溢出 屏幕，而是会吸在顶端
             ),
-            const _CategorySelector(),
+            const SliverPersistentHeader(
+              pinned: true,
+              delegate: _CategorySelectorHeader(),
+            ),
             SliverList(
               delegate: SliverChildListDelegate(children),
             ),
@@ -64,22 +67,46 @@ class _CategorySelector extends StatelessWidget {
       ('Home', () => context.go('/category/home')),
     ];
 
-    return SliverToBoxAdapter(
-      child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-        child: Wrap(
-          spacing: 12,
-          runSpacing: 8,
-          children: categories
-              .map(
-                (category) => ActionChip(
-                  label: Text(category.$1),
-                  onPressed: category.$2,
-                ),
-              )
-              .toList(),
-        ),
+    return Container(
+      color: Styles.scaffoldBackground,
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+      child: Wrap(
+        spacing: 12,
+        runSpacing: 8,
+        children: categories
+            .map(
+              (category) => ActionChip(
+                label: Text(category.$1),
+                onPressed: category.$2,
+              ),
+            )
+            .toList(),
       ),
     );
   }
+}
+
+class _CategorySelectorHeader extends SliverPersistentHeaderDelegate {
+  const _CategorySelectorHeader();
+
+  static const double _height = 72;
+
+  @override
+  Widget build(
+    BuildContext context,
+    double shrinkOffset,
+    bool overlapsContent,
+  ) {
+    return const _CategorySelector();
+  }
+
+  @override
+  double get maxExtent => _height;
+
+  @override
+  double get minExtent => _height;
+
+  @override
+  bool shouldRebuild(covariant SliverPersistentHeaderDelegate oldDelegate) =>
+      false;
 }

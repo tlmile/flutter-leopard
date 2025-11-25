@@ -31,6 +31,22 @@ class DeeplinkStoreApp extends StatelessWidget {
           ),
         ],
       ),
+      builder: (BuildContext context, Widget? child) {
+        return WillPopScope(
+          onWillPop: () async {
+            final NavigatorState rootNavigator =
+                Navigator.of(context, rootNavigator: true);
+
+            if (rootNavigator.canPop()) {
+              rootNavigator.pop();
+              return false;
+            }
+
+            return true;
+          },
+          child: child ?? const SizedBox.shrink(),
+        );
+      },
     );
   }
 }
