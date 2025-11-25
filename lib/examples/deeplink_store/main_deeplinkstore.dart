@@ -19,34 +19,34 @@ class DeeplinkStoreApp extends StatelessWidget {
       routerConfig: GoRouter(
         routes: [
           GoRoute(
-              path: '/',
-            builder: (_, _)=>const ProductList(),
+            path: '/',
+            builder: (_, _) => const ProductList(),
             routes: [
-              GoRoute(path: ':id',builder: (_, _) => const ProductDetails()),
+              GoRoute(path: ':id', builder: (_, _) => const ProductDetails()),
             ],
           ),
           GoRoute(
-              path: '/category/:category',
+            path: '/category/:category',
             builder: (_, _) => const ProductCategoryList(),
           ),
         ],
+        navigatorBuilder: (context, state, child) {
+          return WillPopScope(
+            onWillPop: () async {
+              final NavigatorState rootNavigator =
+                  Navigator.of(context, rootNavigator: true);
+
+              if (rootNavigator.canPop()) {
+                rootNavigator.pop();
+                return false;
+              }
+
+              return true;
+            },
+            child: child ?? const SizedBox.shrink(),
+          );
+        },
       ),
-      builder: (BuildContext context, Widget? child) {
-        return WillPopScope(
-          onWillPop: () async {
-            final NavigatorState rootNavigator =
-                Navigator.of(context, rootNavigator: true);
-
-            if (rootNavigator.canPop()) {
-              rootNavigator.pop();
-              return false;
-            }
-
-            return true;
-          },
-          child: child ?? const SizedBox.shrink(),
-        );
-      },
     );
   }
 }
