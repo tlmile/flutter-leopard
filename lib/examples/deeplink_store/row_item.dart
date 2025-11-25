@@ -20,7 +20,6 @@ class RowItem extends StatelessWidget {
         borderRadius: BorderRadius.circular(4),//四个角都是像素的圆角
         child: Image.asset(//从本地assets目录加载本地资源
           product.assetName,
-          package: product.assetPackage,
           fit: BoxFit.cover,//等比例填充满 width height指定的区域
           width: 68,
           height: 68,
