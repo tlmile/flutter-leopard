@@ -225,14 +225,10 @@ class ProductsRepository {
 }
 
 String getCategoryTitle(Category category) => switch (category) {
-  // TODO: Handle this case.
   Category.all => 'All',
-  // TODO: Handle this case.
   Category.accessories => 'Accessories',
-  // TODO: Handle this case.
   Category.clothing => 'Clothing',
-  // TODO: Handle this case.
-  Category.home => throw UnimplementedError(),
+  Category.home => 'Home',
 };
 
 
