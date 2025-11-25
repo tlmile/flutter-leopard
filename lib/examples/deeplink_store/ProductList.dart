@@ -4,8 +4,22 @@ import 'package:flutter_leopard_demo/examples/deeplink_store/row_item.dart';
 import 'package:flutter_leopard_demo/examples/deeplink_store/styles.dart';
 import 'package:go_router/go_router.dart';
 
-class ProductList extends StatelessWidget {
+class ProductList extends StatefulWidget {
   const ProductList({super.key});
+
+  @override
+  State<ProductList> createState() => _ProductListState();
+}
+
+class _ProductListState extends State<ProductList> {
+  final ScrollController _scrollController = ScrollController();
+
+  @override
+  void dispose() {
+    _scrollController.dispose();
+    super.dispose();
+  }
+
   @override
   Widget build(BuildContext context) {
     final List<Widget> children = ProductsRepository.loadProducts()
@@ -14,8 +28,10 @@ class ProductList extends StatelessWidget {
     return Scaffold(// scaffold 是Material 设计里 一个完整页面的基础结构
       backgroundColor: Styles.scaffoldBackground,
       body: Scrollbar(
+        controller: _scrollController,
         thumbVisibility: true,
         child: CustomScrollView(//可以放多个 Sliver 组件的可滚动区域容器
+          controller: _scrollController,
           slivers: <Widget>[
             const SliverAppBar(
               title: Text(
