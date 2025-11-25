@@ -1,38 +1,18 @@
 import 'package:flutter/material.dart';
+import 'home_page.dart';
 
 void main() {
-  runApp(const LeopardApp());
+  runApp(const LeopardDemo());
 }
 
-class LeopardApp extends StatelessWidget {
-  const LeopardApp({super.key});
+class LeopardDemo extends StatelessWidget {
+  const LeopardDemo({super.key});
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      debugShowCheckedModeBanner: false,
-      title: 'Leopard Demo',
-      theme: ThemeData(
-        useMaterial3: true,
-      ),
-      home: const AuthPage(),
-    );
-  }
-}
-
-/// 你的登录/注册 UI 将写在这里
-class AuthPage extends StatelessWidget {
-  const AuthPage({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return const Scaffold(
-      body: Center(
-        child: Text(
-          '准备开始写登录 / 注册界面…',
-          style: TextStyle(fontSize: 18),
-        ),
-      ),
+    return const MaterialApp(
+      debugShowCheckedModeBanner: true,
+      home: HomePage(),
     );
   }
 }
