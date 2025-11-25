@@ -30,7 +30,7 @@ class DeeplinkStoreApp extends StatelessWidget {
             builder: (_, _) => const ProductCategoryList(),
           ),
         ],
-        builder: (context, state, child) {
+        navigatorBuilder: (context, state, child) {
           return WillPopScope(
             onWillPop: () async {
               final NavigatorState rootNavigator =
