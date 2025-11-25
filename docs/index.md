@@ -23,27 +23,60 @@
 - 创建第一个 Flutter 项目
 - 运行 Android 模拟器
 
-👉 [阅读 Day 1 文档](flutter_day01_install.md)
+👉 [阅读 Day 1 文档](flutter_day01_安装及配置.md)
 
 ---
 
-## 🟩 Day 2 - 第一个 Flutter Widget
-- Scaffold / AppBar
-- Text / Column / Row
-- Hot Reload & Hot Restart
-- MaterialApp 基础
+## 🟩 Day 2 - 第一个 Flutter页面理解架构
+- main.dart代码结构
+- Widget/Element/Render三树关系
+- Stateless与Stateful本质区别
+- State生命周期：init->build->dispose
 
-👉 [阅读 Day 2 文档](flutter_day02_first_widget.md)
+👉 [阅读 Day 2 文档](flutter_day02_架构理解.md)
 
 ---
 
-## 🟪 Day 3 - Flutter 布局基础
+## 🟪 Day 3 - Flutter 快捷键快捷
 - Container
 - Padding / Margin
 - Flex 布局
 - Expanded / Flexible
 
 👉 [阅读 Day 3 文档](flutter_day03_layout.md)
+
+
+
+
+## 🟪 Day 3 - Flutter 快捷键快捷
+- Container
+- Padding / Margin
+- Flex 布局
+- Expanded / Flexible
+
+👉 [阅读 Day 3 文档](flutter_day03_layout.md)
+
+
+
+
+## 🟪 Day 3 - Flutter 快捷键快捷
+- Container
+- Padding / Margin
+- Flex 布局
+- Expanded / Flexible
+
+👉 [阅读 Day 3 文档](flutter_day03_layout.md)
+
+
+
+
+## 🟪 Flutter 快捷键快捷
+- Container
+- Padding / Margin
+- Flex 布局
+- Expanded / Flexible
+
+👉 [阅读 flutter_快捷键 文档](flutter_快捷键.md)
 
 ---
 
