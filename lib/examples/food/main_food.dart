@@ -9,7 +9,7 @@ class FoodExampleApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return const MaterialApp(
+    return MaterialApp(
       debugShowCheckedModeBanner: true,
       home: _FoodPage(),
     );
@@ -21,7 +21,7 @@ class _FoodPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return const Scaffold(
+    return Scaffold(
       appBar: AppBar(title: Text('美食示例')),
       body: Center(
         child: Text('这里将来是美食推荐 / 列表等 UI 示例'),
