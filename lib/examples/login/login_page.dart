@@ -61,7 +61,8 @@ class _LoginPageState extends State<LoginPage>
                         height:
                         MediaQuery.of(context).size.height > 800 ? 191.0 : 150,
                         fit: BoxFit.fill,
-                        image: const AssetImage('assets/img/login_logo.png')),
+                        image: const AssetImage(
+                            'lib/examples/login/assets/img/login_logo.png')),
                   ),
                   Padding(
                     padding: const EdgeInsets.only(top: 20.0),
