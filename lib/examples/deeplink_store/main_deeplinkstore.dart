@@ -8,45 +8,51 @@ import 'package:go_router/go_router.dart';
 
 void main() => runApp(DeeplinkStoreApp());
 
+
 class DeeplinkStoreApp extends StatelessWidget {
   const DeeplinkStoreApp({super.key});
 
   @override
   Widget build(BuildContext context) {
+    final router = GoRouter(
+      routes: [
+        GoRoute(
+          path: '/',
+          builder: (_, __) => const ProductList(),
+          routes: [
+            GoRoute(
+              path: ':id',
+              builder: (_, __) => const ProductDetails(),
+            ),
+          ],
+        ),
+        GoRoute(
+          path: '/category/:category',
+          builder: (_, __) => const ProductCategoryList(),
+        ),
+      ],
+    );
+
     return MaterialApp.router(
       debugShowCheckedModeBanner: false,
       theme: ThemeData.light(),
-      routerConfig: GoRouter(
-        routes: [
-          GoRoute(
-            path: '/',
-            builder: (_, _) => const ProductList(),
-            routes: [
-              GoRoute(path: ':id', builder: (_, _) => const ProductDetails()),
-            ],
-          ),
-          GoRoute(
-            path: '/category/:category',
-            builder: (_, _) => const ProductCategoryList(),
-          ),
-        ],
-        navigatorBuilder: (context, state, child) {
-          return WillPopScope(
-            onWillPop: () async {
-              final NavigatorState rootNavigator =
-                  Navigator.of(context, rootNavigator: true);
+      routerConfig: router,
+      builder: (context, child) {
+        return WillPopScope(
+          onWillPop: () async {
+            final NavigatorState rootNavigator =
+            Navigator.of(context, rootNavigator: true);
 
-              if (rootNavigator.canPop()) {
-                rootNavigator.pop();
-                return false;
-              }
+            if (rootNavigator.canPop()) {
+              rootNavigator.pop();
+              return false;
+            }
 
-              return true;
-            },
-            child: child ?? const SizedBox.shrink(),
-          );
-        },
-      ),
+            return true;
+          },
+          child: child ?? const SizedBox.shrink(),
+        );
+      },
     );
   }
 }
