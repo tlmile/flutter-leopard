@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_leopard_demo/examples/login/sign_in/sign_in.dart';
 import 'package:flutter_leopard_demo/examples/login/sign_up/sign_up.dart';
-import 'package:flutter_leopard_demo/examples/login/widgets/login_background.dart';
-import 'package:flutter_leopard_demo/examples/login/widgets/login_logo.dart';
-import 'package:flutter_leopard_demo/examples/login/widgets/login_menu_bar.dart';
-import 'package:flutter_leopard_demo/examples/login/widgets/login_page_view.dart';
+import 'package:flutter_leopard_demo/examples/login/widgets/login_page_widgets/login_background.dart';
+import 'package:flutter_leopard_demo/examples/login/widgets/login_page_widgets/login_logo.dart';
+import 'package:flutter_leopard_demo/examples/login/widgets/login_page_widgets/login_menu_bar.dart';
+import 'package:flutter_leopard_demo/examples/login/widgets/login_page_widgets/login_page_view.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
