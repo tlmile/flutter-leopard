@@ -3,6 +3,7 @@ import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 
 import 'sign_up_form_divider.dart';
 import 'sign_up_form_field.dart';
+import 'sign_up_password_field.dart';
 
 class SignUpForm extends StatelessWidget {
   const SignUpForm({
@@ -77,49 +78,23 @@ class SignUpForm extends StatelessWidget {
               onSubmitted: () => focusNodePassword.requestFocus(),
             ),
             const SignUpFormDivider(),
-            SignUpFormField(
+            SignUpPasswordField(
               focusNode: focusNodePassword,
               controller: signupPasswordController,
               obscureText: obscureTextPassword,
               hintText: 'Password',
-              icon: const Icon(
-                FontAwesomeIcons.lock,
-                color: Colors.black,
-              ),
               onSubmitted: () => focusNodeConfirmPassword.requestFocus(),
-              suffixIcon: GestureDetector(
-                onTap: togglePasswordVisibility,
-                child: Icon(
-                  obscureTextPassword
-                      ? FontAwesomeIcons.eye
-                      : FontAwesomeIcons.eyeSlash,
-                  size: 15.0,
-                  color: Colors.black,
-                ),
-              ),
+              onTogglePasswordVisibility: togglePasswordVisibility,
             ),
             const SignUpFormDivider(),
-            SignUpFormField(
+            SignUpPasswordField(
               focusNode: focusNodeConfirmPassword,
               controller: signupConfirmPasswordController,
               obscureText: obscureTextConfirmPassword,
               hintText: 'Confirmation',
-              icon: const Icon(
-                FontAwesomeIcons.lock,
-                color: Colors.black,
-              ),
               onSubmitted: onSubmit,
               textInputAction: TextInputAction.go,
-              suffixIcon: GestureDetector(
-                onTap: toggleConfirmPasswordVisibility,
-                child: Icon(
-                  obscureTextConfirmPassword
-                      ? FontAwesomeIcons.eye
-                      : FontAwesomeIcons.eyeSlash,
-                  size: 15.0,
-                  color: Colors.black,
-                ),
-              ),
+              onTogglePasswordVisibility: toggleConfirmPasswordVisibility,
             ),
           ],
         ),
