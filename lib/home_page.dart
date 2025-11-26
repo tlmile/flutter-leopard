@@ -12,10 +12,10 @@ class HomePage extends StatelessWidget {
   Widget build(BuildContext context) {
     final examples = <(String, Widget)>[
       ('深度商品连接', const DeeplinkStoreApp()),
-      ('登录示例', const LoginExampleApp()),
-      ('电影示例', const MovieExampleApp()),
-      ('美食示例', const FoodExampleApp()),
-      ('Compass 示例', const CompassExampleApp()),
+      // ('登录示例', const LoginExampleApp()),
+      // ('电影示例', const MovieExampleApp()),
+      // ('美食示例', const FoodExampleApp()),
+      // ('Compass 示例', const CompassExampleApp()),
     ];
 
     return Scaffold(
