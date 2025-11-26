@@ -1,12 +1,16 @@
 import 'package:flutter/material.dart';
+
 import 'examples/deeplink_store/main_deeplinkstore.dart';
 import 'examples/login/login_page.dart';
 import 'examples/movie/main_movie.dart';
 import 'examples/food/main_food.dart';
 import 'examples/compass_app/main_compass.dart';
+import 'theme/theme_controller.dart';
 
 class HomePage extends StatelessWidget {
-  const HomePage({super.key});
+  const HomePage({super.key, required this.themeController});
+
+  final ThemeController themeController;
 
   @override
   Widget build(BuildContext context) {
@@ -21,6 +25,19 @@ class HomePage extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Leopard 示例集合'),
+        actions: [
+          AnimatedBuilder(
+            animation: themeController,
+            builder: (context, _) {
+              final isDark = themeController.mode == ThemeMode.dark;
+              return IconButton(
+                tooltip: isDark ? '切换到浅色模式' : '切换到深色模式',
+                icon: Icon(isDark ? Icons.dark_mode : Icons.light_mode),
+                onPressed: themeController.toggleThemeMode,
+              );
+            },
+          ),
+        ],
       ),
       body: ListView.builder(
         itemCount: examples.length,
