@@ -3,6 +3,7 @@ import 'package:flutter_leopard_demo/examples/login/sign_in/sign_in.dart';
 import 'package:flutter_leopard_demo/examples/login/sign_up/sign_up.dart';
 import 'package:flutter_leopard_demo/examples/login/themes/theme.dart';
 import 'package:flutter_leopard_demo/examples/login/utils/bubble_indicator_painter.dart';
+
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
 
@@ -10,23 +11,20 @@ class LoginPage extends StatefulWidget {
   _LoginPageState createState() => _LoginPageState();
 }
 
-class _LoginPageState extends State<LoginPage>
-    with SingleTickerProviderStateMixin {
-  late PageController _pageController;
+class _LoginPageState extends State<LoginPage> {
+  final PageController _pageController = PageController();
 
-  Color left = Colors.black;
-  Color right = Colors.white;
+  bool _isSignIn = true;
+
+  @override
+  Color get _leftColor => _isSignIn ? Colors.black : Colors.white;
+
+  Color get _rightColor => _isSignIn ? Colors.white : Colors.black;
 
   @override
   void dispose() {
-    _pageController?.dispose();
+    _pageController.dispose();
     super.dispose();
-  }
-
-  @override
-  void initState() {
-    super.initState();
-    _pageController = PageController();
   }
 
   @override
@@ -73,20 +71,7 @@ class _LoginPageState extends State<LoginPage>
                     child: PageView(
                       controller: _pageController,
                       physics: const ClampingScrollPhysics(),
-                      onPageChanged: (int i) {
-                        FocusScope.of(context).requestFocus(FocusNode());
-                        if (i == 0) {
-                          setState(() {
-                            right = Colors.white;
-                            left = Colors.black;
-                          });
-                        } else if (i == 1) {
-                          setState(() {
-                            right = Colors.black;
-                            left = Colors.white;
-                          });
-                        }
-                      },
+                      onPageChanged: _onPageChanged,
                       children: <Widget>[
                         ConstrainedBox(
                           constraints: const BoxConstraints.expand(),
@@ -128,7 +113,7 @@ class _LoginPageState extends State<LoginPage>
                 child: Text(
                   'Existing',
                   style: TextStyle(
-                      color: left,
+                      color: _leftColor,
                       fontSize: 16.0,
                       fontFamily: 'WorkSansSemiBold'),
                 ),
@@ -144,7 +129,7 @@ class _LoginPageState extends State<LoginPage>
                 child: Text(
                   'New',
                   style: TextStyle(
-                      color: right,
+                      color: _rightColor,
                       fontSize: 16.0,
                       fontFamily: 'WorkSansSemiBold'),
                 ),
@@ -157,12 +142,25 @@ class _LoginPageState extends State<LoginPage>
   }
 
   void _onSignInButtonPress() {
-    _pageController.animateToPage(0,
-        duration: const Duration(milliseconds: 500), curve: Curves.decelerate);
+    _animateToPage(0);
   }
 
   void _onSignUpButtonPress() {
-    _pageController?.animateToPage(1,
-        duration: const Duration(milliseconds: 500), curve: Curves.decelerate);
+    _animateToPage(1);
+  }
+
+  void _onPageChanged(int index) {
+    FocusScope.of(context).requestFocus(FocusNode());
+    setState(() {
+      _isSignIn = index == 0;
+    });
+  }
+
+  void _animateToPage(int page) {
+    _pageController.animateToPage(
+      page,
+      duration: const Duration(milliseconds: 500),
+      curve: Curves.decelerate,
+    );
   }
 }
