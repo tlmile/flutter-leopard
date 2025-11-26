@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_leopard_demo/examples/login/sign_in/sign_in.dart';
+import 'package:flutter_leopard_demo/examples/login/themes/theme.dart';
 
 void main() {
   runApp(const LoginExampleApp());
@@ -11,7 +13,7 @@ class LoginExampleApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       debugShowCheckedModeBanner: true,
-      home: _LoginPage(),
+      home: const _LoginPage(),
     );
   }
 }
@@ -22,9 +24,18 @@ class _LoginPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text('登录示例')),
-      body: Center(
-        child: Text('这里将来是登录页面的 UI 示例'),
+      appBar: AppBar(title: const Text('登录示例')),
+      body: Container(
+        width: double.infinity,
+        decoration: const BoxDecoration(
+          gradient: CustomTheme.primaryGradient,
+        ),
+        child: const SafeArea(
+          child: SingleChildScrollView(
+            padding: EdgeInsets.symmetric(vertical: 24.0, horizontal: 16.0),
+            child: Center(child: SignIn()),
+          ),
+        ),
       ),
     );
   }
