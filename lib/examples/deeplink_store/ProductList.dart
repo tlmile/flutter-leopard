@@ -25,30 +25,39 @@ class _ProductListState extends State<ProductList> {
     final List<Widget> children = ProductsRepository.loadProducts()
         .map<Widget>((Product product) => RowItem(product: product))
         .toList();
-    return Scaffold(// scaffold 是Material 设计里 一个完整页面的基础结构
-      backgroundColor: Styles.scaffoldBackground,
-      body: Scrollbar(
-        controller: _scrollController,
-        thumbVisibility: true,
-        child: CustomScrollView(//可以放多个 Sliver 组件的可滚动区域容器
+    return WillPopScope(
+      onWillPop: () async {
+        if (Navigator.of(context).canPop()) {
+          Navigator.of(context).pop();
+          return false;
+        }
+        return true;
+      },
+      child: Scaffold(// scaffold 是Material 设计里 一个完整页面的基础结构
+        backgroundColor: Styles.scaffoldBackground,
+        body: Scrollbar(
           controller: _scrollController,
-          slivers: <Widget>[
-            const SliverAppBar(
-              title: Text(
-                'Material Store',
-                style: Styles.productListTitle,
+          thumbVisibility: true,
+          child: CustomScrollView(//可以放多个 Sliver 组件的可滚动区域容器
+            controller: _scrollController,
+            slivers: <Widget>[
+              const SliverAppBar(
+                title: Text(
+                  'Material Store',
+                  style: Styles.productListTitle,
+                ),
+                backgroundColor: Styles.scaffoldAppBarBackground,
+                pinned: true,//表示sliverappbar在向上滚动时，不会完全溢出 屏幕，而是会吸在顶端
               ),
-              backgroundColor: Styles.scaffoldAppBarBackground,
-              pinned: true,//表示sliverappbar在向上滚动时，不会完全溢出 屏幕，而是会吸在顶端
-            ),
-            const SliverPersistentHeader(
-              pinned: true,
-              delegate: _CategorySelectorHeader(),
-            ),
-            SliverList(
-              delegate: SliverChildListDelegate(children),
-            ),
-          ],
+              const SliverPersistentHeader(
+                pinned: true,
+                delegate: _CategorySelectorHeader(),
+              ),
+              SliverList(
+                delegate: SliverChildListDelegate(children),
+              ),
+            ],
+          ),
         ),
       ),
     );
