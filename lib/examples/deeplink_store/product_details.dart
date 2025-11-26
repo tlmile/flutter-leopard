@@ -14,16 +14,25 @@ class ProductDetails extends StatelessWidget {
     final Product product = ProductsRepository.loadProduct(
       id: int.parse(currentId),
     );
-    return Scaffold(
-      body: ListView(
-        children: <Widget>[
-          ProductPicture(product: product),
-          Styles.spacer,
-          Text(product.name, style: Styles.productPageItemName),
-          Styles.spacer,
-          Text('\$${product.price}', style: Styles.productPageItemPrice),
-          Styles.largeSpacer,
-        ],
+    return WillPopScope(
+      onWillPop: () async {
+        if (Navigator.of(context).canPop()) {
+          Navigator.of(context).pop();
+          return false;
+        }
+        return true;
+      },
+      child: Scaffold(
+        body: ListView(
+          children: <Widget>[
+            ProductPicture(product: product),
+            Styles.spacer,
+            Text(product.name, style: Styles.productPageItemName),
+            Styles.spacer,
+            Text('\$${product.price}', style: Styles.productPageItemPrice),
+            Styles.largeSpacer,
+          ],
+        ),
       ),
     );
   }

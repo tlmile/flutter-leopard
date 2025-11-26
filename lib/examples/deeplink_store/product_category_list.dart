@@ -33,24 +33,33 @@ class _ProductCategoryListState extends State<ProductCategoryList> {
     final List<Widget> children = ProductsRepository.loadProducts(
       category: category,
     ).map<Widget>((Product p) => RowItem(product: p)).toList();
-    return Scaffold(
-      backgroundColor: Styles.scaffoldBackground,
-      body: Scrollbar(
-        controller: _scrollController,
-        thumbVisibility: true,
-        child: CustomScrollView(
+    return WillPopScope(
+      onWillPop: () async {
+        if (Navigator.of(context).canPop()) {
+          Navigator.of(context).pop();
+          return false;
+        }
+        return true;
+      },
+      child: Scaffold(
+        backgroundColor: Styles.scaffoldBackground,
+        body: Scrollbar(
           controller: _scrollController,
-          slivers: <Widget>[
-            SliverAppBar(
-              title: Text(
-                getCategoryTitle(category),
-                style: Styles.productListTitle,
+          thumbVisibility: true,
+          child: CustomScrollView(
+            controller: _scrollController,
+            slivers: <Widget>[
+              SliverAppBar(
+                title: Text(
+                  getCategoryTitle(category),
+                  style: Styles.productListTitle,
+                ),
+                backgroundColor: Styles.scaffoldAppBarBackground,
+                pinned: true,
               ),
-              backgroundColor: Styles.scaffoldAppBarBackground,
-              pinned: true,
-            ),
-            SliverList(delegate: SliverChildListDelegate(children)),
-          ],
+              SliverList(delegate: SliverChildListDelegate(children)),
+            ],
+          ),
         ),
       ),
     );
