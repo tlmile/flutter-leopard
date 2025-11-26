@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 
+import 'sign_up_form_divider.dart';
+import 'sign_up_form_field.dart';
+
 class SignUpForm extends StatelessWidget {
   const SignUpForm({
     super.key,
@@ -49,149 +52,73 @@ class SignUpForm extends StatelessWidget {
         height: 360.0,
         child: Column(
           children: <Widget>[
-            Padding(
-              padding: const EdgeInsets.only(
-                  top: 20.0, bottom: 20.0, left: 25.0, right: 25.0),
-              child: TextField(
-                focusNode: focusNodeName,
-                controller: signupNameController,
-                keyboardType: TextInputType.text,
-                textCapitalization: TextCapitalization.words,
-                autocorrect: false,
-                style: const TextStyle(
-                    fontFamily: 'WorkSansSemiBold',
-                    fontSize: 16.0,
-                    color: Colors.black),
-                decoration: const InputDecoration(
-                  border: InputBorder.none,
-                  icon: Icon(
-                    FontAwesomeIcons.user,
-                    color: Colors.black,
-                  ),
-                  hintText: 'Name',
-                  hintStyle:
-                      TextStyle(fontFamily: 'WorkSansSemiBold', fontSize: 16.0),
+            SignUpFormField(
+              focusNode: focusNodeName,
+              controller: signupNameController,
+              keyboardType: TextInputType.text,
+              textCapitalization: TextCapitalization.words,
+              hintText: 'Name',
+              icon: const Icon(
+                FontAwesomeIcons.user,
+                color: Colors.black,
+              ),
+              onSubmitted: () => focusNodeEmail.requestFocus(),
+            ),
+            const SignUpFormDivider(),
+            SignUpFormField(
+              focusNode: focusNodeEmail,
+              controller: signupEmailController,
+              keyboardType: TextInputType.emailAddress,
+              hintText: 'Email Address',
+              icon: const Icon(
+                FontAwesomeIcons.envelope,
+                color: Colors.black,
+              ),
+              onSubmitted: () => focusNodePassword.requestFocus(),
+            ),
+            const SignUpFormDivider(),
+            SignUpFormField(
+              focusNode: focusNodePassword,
+              controller: signupPasswordController,
+              obscureText: obscureTextPassword,
+              hintText: 'Password',
+              icon: const Icon(
+                FontAwesomeIcons.lock,
+                color: Colors.black,
+              ),
+              onSubmitted: () => focusNodeConfirmPassword.requestFocus(),
+              suffixIcon: GestureDetector(
+                onTap: togglePasswordVisibility,
+                child: Icon(
+                  obscureTextPassword
+                      ? FontAwesomeIcons.eye
+                      : FontAwesomeIcons.eyeSlash,
+                  size: 15.0,
+                  color: Colors.black,
                 ),
-                onSubmitted: (_) {
-                  focusNodeEmail.requestFocus();
-                },
               ),
             ),
-            Container(
-              width: 250.0,
-              height: 1.0,
-              color: Colors.grey[400],
-            ),
-            Padding(
-              padding: const EdgeInsets.only(
-                  top: 20.0, bottom: 20.0, left: 25.0, right: 25.0),
-              child: TextField(
-                focusNode: focusNodeEmail,
-                controller: signupEmailController,
-                keyboardType: TextInputType.emailAddress,
-                autocorrect: false,
-                style: const TextStyle(
-                    fontFamily: 'WorkSansSemiBold',
-                    fontSize: 16.0,
-                    color: Colors.black),
-                decoration: const InputDecoration(
-                  border: InputBorder.none,
-                  icon: Icon(
-                    FontAwesomeIcons.envelope,
-                    color: Colors.black,
-                  ),
-                  hintText: 'Email Address',
-                  hintStyle:
-                      TextStyle(fontFamily: 'WorkSansSemiBold', fontSize: 16.0),
-                ),
-                onSubmitted: (_) {
-                  focusNodePassword.requestFocus();
-                },
+            const SignUpFormDivider(),
+            SignUpFormField(
+              focusNode: focusNodeConfirmPassword,
+              controller: signupConfirmPasswordController,
+              obscureText: obscureTextConfirmPassword,
+              hintText: 'Confirmation',
+              icon: const Icon(
+                FontAwesomeIcons.lock,
+                color: Colors.black,
               ),
-            ),
-            Container(
-              width: 250.0,
-              height: 1.0,
-              color: Colors.grey[400],
-            ),
-            Padding(
-              padding: const EdgeInsets.only(
-                  top: 20.0, bottom: 20.0, left: 25.0, right: 25.0),
-              child: TextField(
-                focusNode: focusNodePassword,
-                controller: signupPasswordController,
-                obscureText: obscureTextPassword,
-                autocorrect: false,
-                style: const TextStyle(
-                    fontFamily: 'WorkSansSemiBold',
-                    fontSize: 16.0,
-                    color: Colors.black),
-                decoration: InputDecoration(
-                  border: InputBorder.none,
-                  icon: const Icon(
-                    FontAwesomeIcons.lock,
-                    color: Colors.black,
-                  ),
-                  hintText: 'Password',
-                  hintStyle: const TextStyle(
-                      fontFamily: 'WorkSansSemiBold', fontSize: 16.0),
-                  suffixIcon: GestureDetector(
-                    onTap: togglePasswordVisibility,
-                    child: Icon(
-                      obscureTextPassword
-                          ? FontAwesomeIcons.eye
-                          : FontAwesomeIcons.eyeSlash,
-                      size: 15.0,
-                      color: Colors.black,
-                    ),
-                  ),
+              onSubmitted: onSubmit,
+              textInputAction: TextInputAction.go,
+              suffixIcon: GestureDetector(
+                onTap: toggleConfirmPasswordVisibility,
+                child: Icon(
+                  obscureTextConfirmPassword
+                      ? FontAwesomeIcons.eye
+                      : FontAwesomeIcons.eyeSlash,
+                  size: 15.0,
+                  color: Colors.black,
                 ),
-                onSubmitted: (_) {
-                  focusNodeConfirmPassword.requestFocus();
-                },
-              ),
-            ),
-            Container(
-              width: 250.0,
-              height: 1.0,
-              color: Colors.grey[400],
-            ),
-            Padding(
-              padding: const EdgeInsets.only(
-                  top: 20.0, bottom: 20.0, left: 25.0, right: 25.0),
-              child: TextField(
-                focusNode: focusNodeConfirmPassword,
-                controller: signupConfirmPasswordController,
-                obscureText: obscureTextConfirmPassword,
-                autocorrect: false,
-                style: const TextStyle(
-                    fontFamily: 'WorkSansSemiBold',
-                    fontSize: 16.0,
-                    color: Colors.black),
-                decoration: InputDecoration(
-                  border: InputBorder.none,
-                  icon: const Icon(
-                    FontAwesomeIcons.lock,
-                    color: Colors.black,
-                  ),
-                  hintText: 'Confirmation',
-                  hintStyle: const TextStyle(
-                      fontFamily: 'WorkSansSemiBold', fontSize: 16.0),
-                  suffixIcon: GestureDetector(
-                    onTap: toggleConfirmPasswordVisibility,
-                    child: Icon(
-                      obscureTextConfirmPassword
-                          ? FontAwesomeIcons.eye
-                          : FontAwesomeIcons.eyeSlash,
-                      size: 15.0,
-                      color: Colors.black,
-                    ),
-                  ),
-                ),
-                onSubmitted: (_) {
-                  onSubmit();
-                },
-                textInputAction: TextInputAction.go,
               ),
             ),
           ],
