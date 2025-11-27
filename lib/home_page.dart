@@ -5,6 +5,7 @@ import 'examples/login/login_page.dart';
 import 'examples/movie/main_movie.dart';
 import 'examples/food/main_food.dart';
 import 'examples/compass_app/main_compass.dart';
+import 'theme/app_theme.dart';
 import 'theme/theme_controller.dart';
 
 class HomePage extends StatelessWidget {
@@ -26,6 +27,36 @@ class HomePage extends StatelessWidget {
       appBar: AppBar(
         title: const Text('Leopard 示例集合'),
         actions: [
+          AnimatedBuilder(
+            animation: themeController,
+            builder: (context, _) {
+              return PopupMenuButton<int>(
+                tooltip: '切换主题色',
+                initialValue: themeController.themeIndex,
+                onSelected: themeController.setThemeIndex,
+                itemBuilder: (context) {
+                  return AppTheme.themes.asMap().entries.map((entry) {
+                    final index = entry.key;
+                    final theme = entry.value;
+                    return PopupMenuItem<int>(
+                      value: index,
+                      child: Row(
+                        children: [
+                          CircleAvatar(
+                            radius: 10,
+                            backgroundColor: theme.seedColor,
+                          ),
+                          const SizedBox(width: 8),
+                          Text(theme.name),
+                        ],
+                      ),
+                    );
+                  }).toList();
+                },
+                icon: const Icon(Icons.palette_outlined),
+              );
+            },
+          ),
           AnimatedBuilder(
             animation: themeController,
             builder: (context, _) {

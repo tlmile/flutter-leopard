@@ -25,8 +25,8 @@ class LeopardDemo extends StatelessWidget {
       builder: (context, _) {
         return MaterialApp(
           debugShowCheckedModeBanner: true,
-          theme: AppTheme.lightTheme,
-          darkTheme: AppTheme.darkTheme,
+          theme: AppTheme.themeData(themeController.themeIndex, Brightness.light),
+          darkTheme: AppTheme.themeData(themeController.themeIndex, Brightness.dark),
           themeMode: themeController.mode,
           home: HomePage(themeController: themeController),
         );
