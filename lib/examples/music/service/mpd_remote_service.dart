@@ -126,7 +126,7 @@ class MpdRemoteService with WidgetsBindingObserver {
   /// [port] - MPD 端口（通常 6600）
   Future<void> initialize({required String host, required int port}) async {
     if (_isInitialized) {
-      throw StateError('MpdRemoteService is already initialized');
+      _prepareForReinitialize();
     }
 
     _host = host;
@@ -223,6 +223,8 @@ class MpdRemoteService with WidgetsBindingObserver {
   // ==========================================
 
   void _setupLifecycleObservers() {
+    _cleanupLifecycleObservers();
+
     // 优先使用 AppLifecycleListener（Flutter 3.13+）
     try {
       _lifecycleListener = AppLifecycleListener(
@@ -808,6 +810,27 @@ class MpdRemoteService with WidgetsBindingObserver {
     connectionState.value = MpdConnectionState.connected;
     _reconnectAttempt = 0;
     _lastError = null;
+  }
+
+  void _prepareForReinitialize() {
+    debugPrint('Reinitializing MPD service: cleaning up existing connection');
+
+    _pauseOperations();
+    _cleanup();
+    _cleanupLifecycleObservers();
+
+    _isInitialized = false;
+    _isDisposed = false;
+    _needsReconnectionOnResume = true;
+    _reconnectAttempt = 0;
+    _lastError = null;
+
+    isConnected.value = false;
+    isPlaying.value = false;
+    currentSong.value = null;
+    currentPlaylist.value = [];
+    elapsed.value = null;
+    connectionState.value = MpdConnectionState.idle;
   }
 
   /// 清理内部资源（不释放 ValueNotifier）
