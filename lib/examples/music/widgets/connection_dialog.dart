@@ -3,6 +3,7 @@ import 'package:flutter_leopard_demo/examples/music/widgets/dialog_buttons.dart'
 import 'package:flutter_leopard_demo/examples/music/widgets/dialog_header.dart';
 import 'package:flutter/material.dart';
 
+
 class ConnectionDialog extends StatelessWidget {
   final GlobalKey<FormState> formKey;
   final TextEditingController ipController;
@@ -25,38 +26,52 @@ class ConnectionDialog extends StatelessWidget {
   Widget build(BuildContext context) {
     return Dialog(
       backgroundColor: Colors.transparent,
-      child: Container(
-        padding: const EdgeInsets.all(24),
-        decoration: BoxDecoration(
-          color: const Color(0xFF0A0A0A),
-          borderRadius: BorderRadius.circular(20),
-          border: Border.all(color: const Color(0xFF333333), width: 1),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black.withValues(alpha: 0.8),
-              blurRadius: 30,
-              offset: const Offset(0, 15),
+      insetPadding: const EdgeInsets.symmetric(horizontal: 24, vertical: 24),
+      child: LayoutBuilder(
+        builder: (context, constraints) {
+          return Center(
+            child: ConstrainedBox(
+              constraints: const BoxConstraints(
+                maxWidth: 420, // 控制对话框宽度，桌面端、平板看起来更舒服
+              ),
+              child: SingleChildScrollView(
+                child: Container(
+                  padding: const EdgeInsets.all(24),
+                  decoration: BoxDecoration(
+                    color: const Color(0xFF0A0A0A),
+                    borderRadius: BorderRadius.circular(20),
+                    border: Border.all(color: const Color(0xFF333333), width: 1),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black.withValues(alpha: 0.8),
+                        blurRadius: 30,
+                        offset: const Offset(0, 15),
+                      ),
+                    ],
+                  ),
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      const DialogHeader(),
+                      const SizedBox(height: 24),
+                      ConnectionForm(
+                        formKey: formKey,
+                        ipController: ipController,
+                        portController: portController,
+                      ),
+                      const SizedBox(height: 24),
+                      DialogButtons(
+                        isConnecting: isConnecting,
+                        onConnect: onConnect,
+                        onCancel: onCancel,
+                      ),
+                    ],
+                  ),
+                ),
+              ),
             ),
-          ],
-        ),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            const DialogHeader(),
-            const SizedBox(height: 24),
-            ConnectionForm(
-              formKey: formKey,
-              ipController: ipController,
-              portController: portController,
-            ),
-            const SizedBox(height: 24),
-            DialogButtons(
-              isConnecting: isConnecting,
-              onConnect: onConnect,
-              onCancel: onCancel,
-            ),
-          ],
-        ),
+          );
+        },
       ),
     );
   }
