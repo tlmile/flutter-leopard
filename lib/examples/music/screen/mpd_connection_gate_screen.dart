@@ -95,6 +95,30 @@ class _MpdConnectionGateScreenState extends State<MpdConnectionGateScreen>
     super.dispose();
   }
 
+  // Future<void> _initializeAndConnect() async {
+  //   try {
+  //     final prefs = await SharedPreferences.getInstance();
+  //     final savedIp = prefs.getString(_prefsHostKey);
+  //     final savedPort = prefs.getInt(_prefsPortKey);
+  //
+  //     if (!mounted) return;
+  //
+  //     if (savedIp != null &&
+  //         savedIp.isNotEmpty &&
+  //         savedPort != null &&
+  //         savedPort > 0) {
+  //       await _attemptAutoConnect(savedIp, savedPort);
+  //     } else {
+  //       _enterIdleStateAndShowDialog();
+  //     }
+  //   } catch (e, stack) {
+  //     debugPrint('Failed to load MPD settings: $e\n$stack');
+  //     if (!mounted) return;
+  //     _enterIdleStateAndShowDialog();
+  //   }
+  // }
+
+
   Future<void> _initializeAndConnect() async {
     try {
       final prefs = await SharedPreferences.getInstance();
@@ -103,20 +127,42 @@ class _MpdConnectionGateScreenState extends State<MpdConnectionGateScreen>
 
       if (!mounted) return;
 
-      if (savedIp != null &&
-          savedIp.isNotEmpty &&
-          savedPort != null &&
-          savedPort > 0) {
-        await _attemptAutoConnect(savedIp, savedPort);
-      } else {
-        _enterIdleStateAndShowDialog();
+      // 仅用于预填，不自动连接
+      if (savedIp != null && savedIp.isNotEmpty) {
+        _ipController.text = savedIp;
       }
+      if (savedPort != null && savedPort > 0) {
+        _portController.text = savedPort.toString();
+      }
+
+      // 直接进入 idle 状态
+      setState(() {
+        _phase = _ConnectionPhase.idle;
+        _loadingController.stop();
+        _errorMessage = null;
+      });
+
+      // 如果你还想进来就弹出配置对话框，保留这段：
+      Future.delayed(const Duration(milliseconds: 300), () {
+        if (!mounted) return;
+        _showConnectionDialog();
+      });
+
+      // 如果你不想自动弹对话框，只想看到 IdleStateWidget，
+      // 就把上面这段 Future.delayed(...) 整段删掉即可。
+
     } catch (e, stack) {
       debugPrint('Failed to load MPD settings: $e\n$stack');
       if (!mounted) return;
-      _enterIdleStateAndShowDialog();
+
+      setState(() {
+        _phase = _ConnectionPhase.idle;
+        _loadingController.stop();
+        _errorMessage = null;
+      });
     }
   }
+
 
   void _enterIdleStateAndShowDialog() {
     setState(() {
