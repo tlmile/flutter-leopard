@@ -151,7 +151,7 @@ class MpdRemoteService with WidgetsBindingObserver {
       connectionState.value = MpdConnectionState.connected;
       debugPrint('MPD Service initialized successfully ($host:$port)');
     } catch (e) {
-      debugPrint('MPD Service initialization failed: $e');
+      debugPrint('MPD Service initialization failed ($host:$port): $e');
       isConnected.value = false;
       connectionState.value = MpdConnectionState.failed;
       _cleanup();
@@ -469,7 +469,10 @@ class MpdRemoteService with WidgetsBindingObserver {
       await _updateCurrentPlaylist();
       await refreshStoredPlaylist();
     } catch (e) {
-      debugPrint('Failed to initialize state: $e');
+      final host = _host;
+      final port = _port;
+      final target = host != null && port != null ? ' ($host:$port)' : '';
+      debugPrint('Failed to initialize state$target: $e');
       isConnected.value = false;
       rethrow;
     }

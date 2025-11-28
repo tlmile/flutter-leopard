@@ -192,7 +192,10 @@ class _MpdConnectionGateScreenState extends State<MpdConnectionGateScreen>
   }
 
   void _handleConnectionError(Object error) {
-    debugPrint('MPD connection failed: $error');
+    final host = MpdRemoteService.instance.host;
+    final port = MpdRemoteService.instance.port;
+    final target = host != null && port != null ? ' ($host:$port)' : '';
+    debugPrint('MPD connection failed$target: $error');
 
     setState(() {
       _phase = _ConnectionPhase.idle;
