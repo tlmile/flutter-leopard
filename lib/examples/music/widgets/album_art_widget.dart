@@ -25,12 +25,12 @@ class AlbumArtWidget extends StatelessWidget {
 
   Future<Widget> _buildAlbumArt(MpdSong? currentSong) async {
     final String? albumArtist = currentSong?.albumArtist?[0];
-    final String? album = currentSong?.album?[0];
+    final String? title = currentSong?.title?[0];
 
-    // Both album and albumArtist are required to fetch album art safely.
+    // Both title and albumArtist are required to fetch album art safely.
     // If either is missing, fall back to the placeholder.
-    if (album != null && albumArtist != null) {
-      final String? filePath = await getAlbumArtPath(albumArtist, album);
+    if (title != null && albumArtist != null) {
+      final String? filePath = await getAlbumArtPath(albumArtist, title);
 
       // If file path is available, show the image
       if (filePath != null) {
