@@ -1,9 +1,10 @@
 import 'package:flutter_test/flutter_test.dart';
 
-import 'package:flutter_leopard_demo/examples/music/service/musicserver_nokey/music_info_service.dart';
-import 'package:flutter_leopard_demo/examples/music/service/musicserver_nokey/musicbrainz_service.dart';
+import 'package:flutter_leopard_demo/examples/music/service/musicserver_nokey/api_client.dart';
 import 'package:flutter_leopard_demo/examples/music/service/musicserver_nokey/coverart_service.dart';
 import 'package:flutter_leopard_demo/examples/music/service/musicserver_nokey/lyrics_ovh_service.dart';
+import 'package:flutter_leopard_demo/examples/music/service/musicserver_nokey/music_info_service.dart';
+import 'package:flutter_leopard_demo/examples/music/service/musicserver_nokey/musicbrainz_service.dart';
 
 void main() {
   group('MusicInfoService.fetchFullTrackInfo', () {
@@ -44,7 +45,8 @@ void main() {
       ];
 
       final cover = _FakeCoverArtArchiveService();
-      cover.frontCoverUrl = 'http://example.com/front-500';
+      cover.frontCoverUrl =
+          'https://coverartarchive.org/release/release-1/front-500';
 
       final lyrics = _FakeLyricsOvhService()
         ..result = LyricsResult(found: true, lyrics: 'Look at the stars');
@@ -100,6 +102,51 @@ void main() {
         (artist: 'Fallback Artist', title: 'Track'),
       );
       expect(result.coverUrl, isNull);
+    });
+  });
+
+  group('service url building', () {
+    test('MusicBrainzService builds correct search URL', () async {
+      final api = _FakeApiClient(response: {'recordings': []});
+      final service = MusicBrainzService(api);
+
+      await service.searchRecordingsByArtistAndTitle(
+        'Coldplay',
+        'Yellow',
+        limit: 3,
+      );
+
+      expect(
+        api.lastUri.toString(),
+        'https://musicbrainz.org/ws/2/recording'
+        '?query=artist%3A%22Coldplay%22+AND+recording%3A%22Yellow%22'
+        '&fmt=json&limit=3&offset=0',
+      );
+    });
+
+    test('CoverArtArchiveService builds correct cover URL', () {
+      final service = CoverArtArchiveService(_FakeApiClient(response: {}));
+
+      final url = service.buildFrontCoverUrl('release-123', size: '500');
+
+      expect(
+        url,
+        'https://coverartarchive.org/release/release-123/front-500',
+      );
+    });
+
+    test('LyricsOvhService hits lyrics endpoint', () async {
+      final api = _FakeApiClient(response: {'lyrics': 'Fix you'});
+      final service = LyricsOvhService(api);
+
+      final result = await service.getLyrics('Coldplay', 'Yellow');
+
+      expect(result.found, isTrue);
+      expect(result.lyrics, 'Fix you');
+      expect(
+        api.lastUri.toString(),
+        'https://api.lyrics.ovh/v1/Coldplay/Yellow',
+      );
     });
   });
 }
@@ -176,5 +223,22 @@ class _FakeLyricsOvhService implements LyricsOvhService {
   Future<LyricsResult> getLyrics(String artist, String title) async {
     requests.add((artist: artist, title: title));
     return result;
+  }
+}
+
+class _FakeApiClient extends ApiClient {
+  final Map<String, dynamic> response;
+  Uri? lastUri;
+
+  _FakeApiClient({required this.response}) : super(enableCaching: false);
+
+  @override
+  Future<Map<String, dynamic>> getJson(
+    Uri uri, {
+    Map<String, String>? headers,
+    bool forceRefresh = false,
+  }) async {
+    lastUri = uri;
+    return response;
   }
 }
