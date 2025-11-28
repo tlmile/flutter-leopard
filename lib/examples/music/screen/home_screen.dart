@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_leopard_demo/examples/music/screen/common/todo_screen.dart';
 
 import '../service/mpd_remote_service.dart';
 import '../service/settings.dart';
