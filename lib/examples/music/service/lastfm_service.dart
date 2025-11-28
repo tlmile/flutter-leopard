@@ -39,7 +39,8 @@ class LastfmService {
   //从环境变量读取 api key
   static const String apiKey = String.fromEnvironment(
     "lastfm_api_key",
-    defaultValue: "6fd88ef256bfc274dfa0797dded2bcdb",
+    // defaultValue: "6fd88ef256bfc274dfa0797dded2bcdb",
+    defaultValue: "b25b959554ed76058ac220b7b2e0a026",
   );
 
   LastfmService();
