@@ -84,13 +84,12 @@ class _SongMoreBottomPopupSheetWidgetState
                             borderRadius: BorderRadius.circular(4),
                             color: const Color(0xFF3A3A3A),
                           ),
-                          child:
-                              (widget.song.album != null &&
+                          child: (widget.song.title != null &&
                                   widget.song.albumArtist != null)
                               ? FutureBuilder(
                                   future: getAlbumArtPath(
                                     widget.song.albumArtist!.join("/"),
-                                    widget.song.album!.join("/"),
+                                    widget.song.title!.join("/"),
                                   ),
                                   builder: (context, snapshot) {
                                     if (snapshot.hasData) {

@@ -165,7 +165,6 @@ class _BottomIslandWidgetState extends State<BottomIslandWidget>
                             builder: (context, currentSong, child) {
                               // Get the current song information
                               String? songTitle = currentSong?.title?.join("");
-                              String? album = currentSong?.album?.join("");
                               String? albumArtistName = currentSong?.albumArtist
                                   ?.join("/");
 
@@ -179,13 +178,12 @@ class _BottomIslandWidgetState extends State<BottomIslandWidget>
                                       color: Colors.grey[800],
                                       borderRadius: BorderRadius.circular(8),
                                     ),
-                                    child:
-                                        (albumArtistName != null &&
-                                            album != null)
+                                    child: (albumArtistName != null &&
+                                            songTitle != null)
                                         ? FutureBuilder(
                                             future: getAlbumArtPath(
                                               albumArtistName,
-                                              album,
+                                              songTitle,
                                             ),
                                             builder: (context, snapshot) {
                                               if (snapshot.hasData) {
