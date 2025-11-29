@@ -49,6 +49,7 @@ class _PlayerScreenState extends State<PlayerScreen> {
       if (!isFavourite.value) {
         // Add to favourites if not already present.
         await client.playlistadd(Settings.defaultFavoritePlaylistName, song.file);
+        await MpdRemoteService.instance.refreshStoredPlaylist();
         isFavourite.value = true;
         debugPrint(
           'Added "${song.title?.join("") ?? "Unknown"}" to favourites',
@@ -64,6 +65,7 @@ class _PlayerScreenState extends State<PlayerScreen> {
 
         // Remove the song at [index] from the playlist.
         await client.playlistdelete(Settings.defaultFavoritePlaylistName, MpdPosition(index));
+        await MpdRemoteService.instance.refreshStoredPlaylist();
         isFavourite.value = false;
         debugPrint(
           'Removed "${song.title?.join("") ?? "Unknown"}" from favourites',
