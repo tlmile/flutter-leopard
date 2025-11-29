@@ -648,6 +648,7 @@ class MpdRemoteService with WidgetsBindingObserver {
         Settings.defaultFavoritePlaylistName,
       );
     } catch (_) {
+      favoriteSongList.value = [];
       debugPrint(
         "Favorite playlist doesn't exist. It will be created when user adds a song to favorite",
       );
