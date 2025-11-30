@@ -39,15 +39,22 @@ class MpdConnectionGateScreen extends StatefulWidget {
       _MpdConnectionGateScreenState();
 }
 
+///with表示混别的类功能，我的state需要用动画，所以 我混入TickerProviderStateMixin来支持vsync
+///多个动画ticker时使用TickerProviderStateMixin，单个ticker时，使用更轻量的with SingleTickerProviderStateMixin
 class _MpdConnectionGateScreenState extends State<MpdConnectionGateScreen>
     with TickerProviderStateMixin {
   static const _prefsHostKey = 'mpd_ip';
   static const _prefsPortKey = 'mpd_port';
   static const _defaultPort = 6600;
 
+  //管理 TextField 输入内容的控制器
+//  获取输入框内容：_ipController.text
+//  设置输入框内容：_ipController.text = "xxx"
+//  监听输入变化：_ipController.addListener(...)
   final TextEditingController _ipController = TextEditingController();
   final TextEditingController _portController =
   TextEditingController(text: '$_defaultPort');
+  //form的全局Key，用于管理Form的状态，因为 Form 的校验（validate）、保存（save）都需要通过这个 Key 调用。
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
 
   _ConnectionPhase _phase = _ConnectionPhase.initializing;
@@ -68,6 +75,9 @@ class _MpdConnectionGateScreenState extends State<MpdConnectionGateScreen>
     _initializeAndConnect();
   }
 
+  //初始化三个动画：
+  // pulse（脉冲/呼吸）、error（抖动/错误动画）、loading（旋转/加载动画），
+  // 并让 loading 动画从一开始就自动转起来。
   void _initializeAnimations() {
     _pulseController = AnimationController(
       duration: const Duration(seconds: 2),
@@ -95,37 +105,15 @@ class _MpdConnectionGateScreenState extends State<MpdConnectionGateScreen>
     super.dispose();
   }
 
-  // Future<void> _initializeAndConnect() async {
-  //   try {
-  //     final prefs = await SharedPreferences.getInstance();
-  //     final savedIp = prefs.getString(_prefsHostKey);
-  //     final savedPort = prefs.getInt(_prefsPortKey);
-  //
-  //     if (!mounted) return;
-  //
-  //     if (savedIp != null &&
-  //         savedIp.isNotEmpty &&
-  //         savedPort != null &&
-  //         savedPort > 0) {
-  //       await _attemptAutoConnect(savedIp, savedPort);
-  //     } else {
-  //       _enterIdleStateAndShowDialog();
-  //     }
-  //   } catch (e, stack) {
-  //     debugPrint('Failed to load MPD settings: $e\n$stack');
-  //     if (!mounted) return;
-  //     _enterIdleStateAndShowDialog();
-  //   }
-  // }
-
-
+  //上面完成了初始化动画
+  // 本方法 实现读取本地存储 + 自动连接到 MPD
   Future<void> _initializeAndConnect() async {
     try {
       final prefs = await SharedPreferences.getInstance();
       final savedIp = prefs.getString(_prefsHostKey);
       final savedPort = prefs.getInt(_prefsPortKey);
 
-      if (!mounted) return;
+      if (!mounted) return; //如果当前widget已经被移除，销毁就不要再更新UI或setState了
 
       // 仅用于预填，不自动连接
       if (savedIp != null && savedIp.isNotEmpty) {
@@ -228,6 +216,7 @@ class _MpdConnectionGateScreenState extends State<MpdConnectionGateScreen>
 
   Future<void> _saveConnectionSettings(String host, int port) async {
     try {
+      //获取本地配置对象，并配置属性值
       final prefs = await SharedPreferences.getInstance();
       await prefs.setString(_prefsHostKey, host);
       await prefs.setInt(_prefsPortKey, port);
@@ -291,7 +280,7 @@ class _MpdConnectionGateScreenState extends State<MpdConnectionGateScreen>
   void _showConnectionDialog() {
     showDialog<void>(
       context: context,
-      barrierDismissible: false,
+      barrierDismissible: false,//true: 用户点击外面可关闭
       builder: (dialogContext) => ConnectionDialog(
         formKey: _formKey,
         ipController: _ipController,
@@ -326,8 +315,8 @@ class _MpdConnectionGateScreenState extends State<MpdConnectionGateScreen>
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.black,
-      body: SafeArea(
-        child: Stack(
+      body: SafeArea(//保证你的页面内容 不要跑到刘海，状态栏，底部手势条下面去。
+        child: Stack(//是一个层叠布局，可以把多个子组件叠在一起 例如：背影图+上面一层半透明蒙版+再上面内容
           children: [
             if (_isInitializing)
               LoadingStateWidget(animation: _loadingController)
